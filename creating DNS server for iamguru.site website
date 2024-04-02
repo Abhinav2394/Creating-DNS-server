@@ -1,0 +1,45 @@
+Creating a DNS server on AWS EC-2 Instance.
+
+1. Launch a Instance on AWS using Redhat OS
+2. Install bind package, command “ yum install bind -y”
+3. Start and enable named service, command “ systemctl enable —now named”
+4. Open named.conf file inside /etc directory, Command “ vim /etc/named.conf “
+5. Clear all content of file ( :%d ) and make entry as :
+        
+options	{
+        directory “/var/named”;
+        recursion no;
+};
+zone “iamguru.site”	IN	{
+        type master;
+        file “new_dns”
+};
+
+note:- don't copy paste, write as it is
+
+5. Check config entry with command ==> named.checkconf /etc/named.conf
+       # if nothing appears , entry is correct
+6. Copy file /var/named/named.empty  with preserving permissions to /var/named/  command “ cp -p /var/named/named.empty /var/named/new_dns
+7. Open the copied file “new_dns” , command “ vim /var/named/new_dns ”
+8. Make entry as below :- 
+
+$TTL 1M
+@       IN SOA  @ rname.invalid. (
+                               0       ; serial
+                               1D      ; refresh
+                               1H      ; retry
+                               1W      ; expire
+                               3H )    ; minimum
+@       IN      NS      ns1.iamguru.site.
+@       IN      NS      ns2.iamguru.site.
+ns1     IN      A       13.127.128.57
+ns2     IN      A       13.127.128.57
+iamguru.site.    IN      A       3.110.135.58
+www     IN      CNAME   iamguru.site
+
+note :- erase all and make entry accordingly
+
+9. Make changes in child nameserver of registrar and point dns to ns1.iamguru.site , ns2.iamguru.site
+10. We can check DNS is working or not by, 
+                    Command  “nslookup iamgurur.site localhost”
+    If we can see IP of domain then, it is correct
